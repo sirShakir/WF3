@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>A Meaningful Page Title</title>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.12.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.12.0/mapbox-gl.css' rel='stylesheet' />
+
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css" />
+
+ 
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.0.0/dist/sweetalert2.min.js"></script>
+    <script src="./index.js"></script>
+
+    <style>
+      #popupFormDiv{
+        display: none;
+        position: fixed;
+        z-index: 2;
+        background-color: aliceblue;
+        right: 50%;
+        top: 40%;
+      }
+        #profile_icon{
+            z-index: 11;
+            height: 50px;
+            width: 50px;
+        }
+        #map {
+          width: 100%;
+          height: 100%;
+        }img{
+          height: 50px;
+          width: 50px;
+        }
+    </style>
+
+<ion-menu content-id="main-content">
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Menu Content</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding">This is the menu content.</ion-content>
+</ion-menu>
+<div class="ion-page" id="main-content">
+<ion-header>
+    <ion-toolbar>
+    <ion-buttons slot="start">
+        <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <!-- <ion-title>WaveFinder</ion-title> -->
+    <ion-icon id="profile_icon" name="person-circle-outline" onclick="getLocation()"></ion-icon>
+    <img src="./wave.gif" alt="Italian Trulli">
+    </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+<div id="popupFormDiv">
+  <form action="/checkin" method="post">
+    <label for="username">Username:</label><br>
+    <input type="text" id="username" name="username">
+    <br>
+    <!-- <br><br> -->
+    <label for="lat">lat:</label><br>
+    <input type="text" id="lat" name="lat">
+    <br>
+
+    <label for="lon">lon:</label><br>
+    <input type="text" id="lon" name="lon">
+    <br>
+
+    <label for="event">event:</label><br>
+    <input type="text" id="event" name="event">
+    <br>
+
+    <label for="note">note:</label><br>
+    <input type="text" id="note" name="note">
+    <br>
+
+    <label for="group">group:</label><br>
+    <input type="text" id="group" name="group">
+    <br><br>
+    <input type="submit" value="Submit">
+    
+  </form>
+</div>
+
+
+
+    <div id='map'></div>
+</ion-content>
+</div>
+
+<!-- <div style='width: 100%;position: fixed;z-index: 10;'>
+    <ion-icon id="profile_icon" name="person-circle-outline"></ion-icon>
+    
+</div> -->
+
+
+
+    <script>
+    // TO MAKE THE MAP APPEAR YOU MUST
+    // ADD YOUR ACCESS TOKEN FROM
+    // https://account.mapbox.com
+
+        //'pk.eyJ1IjoibWFwYm94LW1hcC1kZXNpZ24iLCJhIjoiY2syeHpiaHlrMDJvODNidDR5azU5NWcwdiJ9.x0uSqSWGXdoFKuHZC5Eo_Q'
+        mapboxgl.accessToken = 'pk.eyJ1IjoiZGNoZW5ldDEwMTciLCJhIjoiY2pzMmswdTBmMXE4ajQzbzloMWVibzVsdSJ9.xH2NkDZmTFe7ioUJ0wPNMQ';
+        var map = new mapboxgl.Map({
+        container: 'map', // container ID
+        style: 'mapbox://styles/mapbox/streets-v12', // style URL
+        center: [-74.5, 40], // starting position [lng, lat]
+        zoom: 9, // starting zoom
+    });
+
+map.on('load', function() {
+  map.resize();
+  
+});
+
+
+ 
+    </script>
+<script>
+
+
+  
+  </script>
+
+  <script>
+
+  </script>
+</body>
+</html>
+
+
+
+
+  

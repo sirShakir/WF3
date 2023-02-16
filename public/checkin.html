@@ -1,0 +1,45 @@
+<form action="/checkin" method="post">
+    <label for="username">Username:</label><br>
+    <input type="text" id="username" name="username">
+    <br>
+    <!-- <br><br> -->
+    <label for="lat">lat:</label><br>
+    <input type="text" id="lat" name="lat">
+    <br>
+
+    <label for="lon">lon:</label><br>
+    <input type="text" id="lon" name="lon">
+    <br>
+
+    <label for="event">event:</label><br>
+    <input type="text" id="event" name="event">
+    <br>
+
+    <label for="note">note:</label><br>
+    <input type="text" id="note" name="note">
+    <br>
+
+    <label for="group">group:</label><br>
+    <input type="text" id="group" name="group">
+    <br><br>
+    <input type="submit" value="Submit">
+    
+  </form>
+
+  <script>
+    getLocation();
+    function getLocation() {
+      if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(showPosition);
+      } else { 
+          x.innerHTML = "Geolocation is not supported by this browser.";
+      }
+  }
+  function showPosition(position) {
+   var a = position.coords.latitude + ',' + position.coords.longitude;
+   document.getElementById("lat").value = position.coords.latitude
+   document.getElementById("lon").value = position.coords.longitude
+
+   //alert(a)
+  }
+  </script>
