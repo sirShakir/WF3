@@ -1,6 +1,8 @@
    
 const xhr = new XMLHttpRequest();
 const xhr2 = new XMLHttpRequest();
+const xhr3 = new XMLHttpRequest();
+
 var checkins_all;
 var events_all;
    
@@ -10,7 +12,7 @@ function load1_checkins(){
     if (xhr2.status === 200) {
       const response = JSON.parse(xhr2.responseText);
       //const venues = response.response.venues;
-      console.log(response);
+      //console.log(response);
       checkins_all = response;
       load2_events();
     } else {
@@ -60,15 +62,16 @@ function dropMarkers(response){
       for(x=0; x<checkins_all.length; x++){
         if(checkins_all[x].event == element.name){
           event_checkins.push(checkins_all[x]);
-          console.log(event_checkins)
+          //console.log(event_checkins)
         }  
       }
-     
+      var encodedName =  element.name.replace(/'/g, '');
+      var html = '<button onclick="checkInVendor(\'' + encodedName + '\')" type="button" class="btn btn-success">Checkin</button>';
       if(event_checkins.length > 0){
         var marker1 = new mapboxgl.Marker()
         .setLngLat([element.geocodes.main.longitude, element.geocodes.main.latitude])
         .setPopup(new mapboxgl.Popup({ offset: 25 })
-        .setHTML('<h2>'+element.name+'</h2> <br> <p>'+element.location.formatted_address+'<p/> <p> Checkin count is: '+ JSON.stringify(event_checkins.length) +'</p>'))
+        .setHTML('<h2>'+element.name+'</h2> <br> <p>'+element.location.formatted_address+'<p/> <p> Checkin count is: '+ JSON.stringify(event_checkins.length) +`</p><br>` + html))
         //.setHTML('<h2>'+element.name+'</h2><p>'+ JSON.stringify(event_checkins) +' is checked-in</p>'))
         .addTo(map);
         markers.push(marker1);
@@ -76,7 +79,7 @@ function dropMarkers(response){
         var marker1 = new mapboxgl.Marker()
         .setLngLat([element.geocodes.main.longitude, element.geocodes.main.latitude])
         .setPopup(new mapboxgl.Popup({ offset: 25 })
-        .setHTML('<h2>'+element.name+'</h2><p> No checkins available.</p>'))
+        .setHTML('<h2>'+element.name+'</h2><p> No checkins available.</p><br>' + html))
         .addTo(map);
         markers.push(marker1);
       }
@@ -93,7 +96,7 @@ function dropMarkers(response){
         //console.log(marker)
         console.log(map.getZoom())
 
-        if(map.getZoom() > 12){
+        if(map.getZoom() > 15){
           marker.togglePopup();
         }
       }
@@ -103,7 +106,126 @@ function dropMarkers(response){
 }
 
 
+function search_bar_events(){
+  let searchInputValue = document.getElementById("searchInputValue").value;
+  //console.log(searchInputValue)
+  //console.log(events_all.results[0].name)
+  let temp_events = [];
+  for(let x=0; x<events_all.results.length; x++){
+    let isPushed = false;
+    //console.log(events_all[x])
+    if( events_all.results[x].name.includes(searchInputValue) ){
+      temp_events.push(events_all.results[x]);
+      isPushed = true;
+    }
+
+    if(isPushed == false){
+      //console.log(events_all.results[x].categories);
+      for(let v=0; v< events_all.results[x].categories.length; v++){
+        //console.log(events_all.results[x].categories);
+        if( events_all.results[x].categories[v].name.includes(searchInputValue) && isPushed == false){
+          temp_events.push(events_all.results[x]);
+          isPushed = true;
+        }
+      }//end of second for loop
+    }
 
 
+  }//end of outer for loop
+  console.log(temp_events)
+}//end of function
 
+let profile_toggle = false;
+function toggleProfileView(){
+  if(profile_toggle == false){
+    document.getElementById("profileBar").style.display = "inline-block" 
+    profile_toggle = true
+  }else{
+    document.getElementById("profileBar").style.display = "none" 
+    profile_toggle = false;
+  }
+}
+
+var user;
+function getUserDeatails(){
+  xhr3.open("GET", "./user");
+   xhr3.onload = function() {
+    if (xhr3.status === 200) {
+      const response = JSON.parse(xhr3.responseText);
+      //console.log(response);  
+      user = response;
+      document.getElementById("profileBar").innerHTML += `<br>Username: `+JSON.stringify(user.username);
+
+    } else {
+      console.error(xhr3.statusText);   
+
+    }
+  };
+
+  xhr3.onerror = function() {
+    console.error(xhr3.statusText);   
+  };
+  
+  xhr3.send();
+}
+getUserDeatails();
+
+function checkIn(vendername){
+  Swal.fire({
+    icon: 'success',
+    title: 'Check-in',
+    html:'<label for="username">Username:</label><br><input type="text" readonly id="username" name="username"><br><label for="lat">lat:</label><br><input type="text" readonly id="lat" name="lat"><br><label for="lon">lon:</label><br><input type="text" readonly id="lon" name="lon"><br><label for="event">event:</label><br><input type="text" id="event" name="event"><br><label for="note">note:</label><br><input type="text" id="note" name="note"><br><label for="group">group:</label><br><input type="text" id="group" name="group"><br><br><input type="submit" value="Submit">',
+    target: document.body
+  })
+  document.getElementById("username").value = user.username;
+  if(vendername){
+    document.getElementById("event").value = vendername;
+  }
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      function(position) {
+        const latitude = position.coords.latitude;
+        document.getElementById("lat").value = latitude;
+        const longitude = position.coords.longitude;
+        document.getElementById("lon").value = longitude;
+        //console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+      },
+      function(error) {
+        console.error(`Geolocation error: ${error.message}`);
+      }
+    );
+  } 
+  else {
+    console.error('Geolocation not supported');
+}}
+
+function checkInVendor(vendername){
+  console.log("checkinVendero is called")
+  Swal.fire({
+    icon: 'success',
+    title: 'Check-in',
+    html:'<label for="username">Username:</label><br><input type="text" readonly id="username" name="username"><br><label for="lat">lat:</label><br><input type="text" readonly id="lat" name="lat"><br><label for="lon">lon:</label><br><input type="text" readonly id="lon" name="lon"><br><label for="event">event:</label><br><input type="text" readonly id="event" name="event"><br><label for="note">note:</label><br><input type="text" id="note" name="note"><br><label for="group">group:</label><br><input type="text" id="group" name="group"><br><br><input type="submit" value="Submit">',
+    target: document.body
+  })
+  document.getElementById("username").value = user.username;
+  if(vendername){
+    document.getElementById("event").value = vendername;
+  }
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      function(position) {
+        const latitude = position.coords.latitude;
+        document.getElementById("lat").value = latitude;
+        const longitude = position.coords.longitude;
+        document.getElementById("lon").value = longitude;
+        //console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+      },
+      function(error) {
+        console.error(`Geolocation error: ${error.message}`);
+      }
+    );
+  } 
+  else {
+    console.error('Geolocation not supported');
+}}
   

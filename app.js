@@ -40,17 +40,17 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
   
 app.post('/register', (req, res) => {
-    console.log(req.body.username)
-    console.log(req.body.password)
+    //console.log(req.body.username)
+    //console.log(req.body.password)
 
     User.register(new User({ username: req.body.username }), 
     req.body.password, (err, user) => {
     if (err) {
-      console.log(err);
+      //console.log(err);
       return res.status(500).json({ message: 'Failed to register user' });
     }
     passport.authenticate('local')(req, res, () => {
-      console.log("User registered");
+      //console.log("User registered");
       return res.status(201).json({ message: 'User registered successfully' });
     });
   });
@@ -63,14 +63,14 @@ app.get('/noauth', (req, res) => {
     res.sendFile(path.join(__dirname, '/public/noauth.html'));
 });
 app.get('/', (req, res) => {
-    console.log("are we here?")
+    //console.log("are we here?")
 
     if(req.isAuthenticated()){   
-        console.log("goood")
+       // console.log("goood")
 
         res.sendFile(path.join(__dirname, 'public/index.html'));
     }else{
-        console.log("badd")
+        //.log("badd")
         res.sendFile(path.join(__dirname, 'public/login.html'));
     }
 });
@@ -82,7 +82,7 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/checkin', (req, res) => {
-    console.log("Checkin System is working")
+    //console.log("Checkin System is working")
     if(req.isAuthenticated()){
         // console.log(req.body.username)
         // console.log(req.body.lat)
@@ -115,7 +115,7 @@ app.get('/checkins', (req, res) => {
                 res.send(err);
             } else {
 
-                console.log(checkins)
+                //console.log(checkins)
                 res.json(checkins)
             }
             }); 
@@ -127,7 +127,7 @@ app.get('/checkins', (req, res) => {
    
 });
 app.get('/checkin', (req, res) => {
-    console.log("Checkin System is working")
+    //console.log("Checkin System is working")
     if(req.isAuthenticated()){
   
         res.sendFile(path.join(__dirname, '/public/checkin.html'));
@@ -147,6 +147,23 @@ app.get('/users', (req, res) => {
             res.send(users);
         }
         }); 
+    }
+    else{
+        res.send("you are not authorized");
+    }
+   
+});
+
+app.get('/user', (req, res) => {
+    //console.log(req.session.passport.user)
+    if(req.isAuthenticated()){
+        User.findOne({'username': req.session.passport.user}, function(err, users){
+            if(err){
+              return res.send('Error');
+            }
+            //console.log(users)
+            res.json(users);
+          });
     }
     else{
         res.send("you are not authorized");

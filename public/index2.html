@@ -18,19 +18,16 @@
  
 </head>
 <body>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.0.0/dist/sweetalert2.min.js"></script>
     <script src="./index.js"></script>
 
     <style>
       .dropdown-menu{
-        z-index: 22;
+z-index: 22;
       }
       #seachBar{
-        /* position: absolute; */
-        width : 25vw;
-        /* top: 8vh; */
-        display: inline-block;
+        float :right;
+        width : 50vw;
       }
       #popupFormDiv{
         display: none;
@@ -51,96 +48,85 @@
         }img{
           height: 50px;
           width: 50px;
-          display: inline-block;
-        }
-        #profileBar{
-          top: 5vh;
-          height: 90vh;
-          display: none;
-          width: 25vw;
-          position: fixed;
-          z-index: 2;
-          background-color: rgb(132, 132, 132);
-        }
-        svg{
-          vertical-align: middle;
-
-        }
-        #topBar{
-          position: relative;
-          background-color: whitesmoke;
-        }
-        #profile_icon{
-          z-index: 3;
-        }
-        #centerdiv{
-          position: fixed;
-          width: 100vw;
-          height: 100vh;
-        }
-        .swal2-container{
-          height: 100vh;
         }
     </style>
 
-<div id="profileBar">
-  Welcome to your profile
-
-</div>
-<div id="topBar">
-
-  <svg xmlns="http://www.w3.org/2000/svg" id="profile_icon" width="50" height="50" fill="currentColor" class="bi bi-person-vcard-fill" viewBox="0 0 16 16" onclick="toggleProfileView()">
-    <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm9 1.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 0-1h-4a.5.5 0 0 0-.5.5ZM9 8a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 0-1h-4A.5.5 0 0 0 9 8Zm1 2.5a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 0-1h-3a.5.5 0 0 0-.5.5Zm-1 2C9 10.567 7.21 9 5 9c-2.086 0-3.8 1.398-3.984 3.181A1 1 0 0 0 2 13h6.96c.026-.163.04-.33.04-.5ZM7 6a2 2 0 1 0-4 0 2 2 0 0 0 4 0Z"/>
-  </svg>
-  <img src="./wave.gif" alt="Italian Trulli">
-
-  <div class="input-group mb-3" id="seachBar">
-    <div class="input-group-prepend">
-      <button type="button" class="btn btn-outline-secondary">Action</button>
-      <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <span class="sr-only">Toggle Dropdown</span>
-      </button>
-      <div class="dropdown-menu">
-        <a class="dropdown-item" href="#">Nightlife</a>
-        <a class="dropdown-item" href="#">Food</a>
-        <a class="dropdown-item" href="#">Museums</a>
-        <div role="separator" class="dropdown-divider"></div>
-        <a class="dropdown-item" href="#">Separated link</a>
-      </div>
-      <input type="text" id='searchInputValue' oninput="search_bar_events();" class="form-control" aria-label="Text input with segmented dropdown button">
-
-    </div>
-  </div>
-
-  <button onclick="checkIn()" type="button" class="btn btn-success">Checkin</button>
-  <button type="button" class="btn btn-info">Wave Leader Drop</button>
-  <button type="button" class="btn btn-secondary">Vendor Panal</button>
-
-</div>
-
-
-<!-- <ion-header>
+<ion-menu content-id="main-content">
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Menu Content</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding">This is the menu content.</ion-content>
+</ion-menu>
+<div class="ion-page" id="main-content">
+<ion-header>
     <ion-toolbar>
     <ion-buttons slot="start">
         <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title>WaveFinder</ion-title>
+    <!-- <ion-title>WaveFinder</ion-title> -->
     <ion-icon id="profile_icon" name="person-circle-outline" onclick="getLocation()"></ion-icon>
     <img src="./wave.gif" alt="Italian Trulli">
+    <div class="input-group mb-3" id="seachBar">
+      <div class="input-group-prepend">
+        <button type="button" class="btn btn-outline-secondary">Action</button>
+        <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <span class="sr-only">Toggle Dropdown</span>
+        </button>
+        <div class="dropdown-menu">
+          <a class="dropdown-item" href="#">Action</a>
+          <a class="dropdown-item" href="#">Another action</a>
+          <a class="dropdown-item" href="#">Something else here</a>
+          <div role="separator" class="dropdown-divider"></div>
+          <a class="dropdown-item" href="#">Separated link</a>
+        </div>
+      </div>
+      <input type="text" class="form-control" aria-label="Text input with segmented dropdown button">
+    </div>
     </ion-toolbar>
-</ion-header> -->
+</ion-header>
+<ion-content class="ion-padding">
+<div id="popupFormDiv">
+  <form action="/checkin" method="post">
+    <label for="username">Username:</label><br>
+    <input type="text" id="username" name="username">
+    <br>
+    <!-- <br><br> -->
+    <label for="lat">lat:</label><br>
+    <input type="text" id="lat" name="lat">
+    <br>
+
+    <label for="lon">lon:</label><br>
+    <input type="text" id="lon" name="lon">
+    <br>
+
+    <label for="event">event:</label><br>
+    <input type="text" id="event" name="event">
+    <br>
+
+    <label for="note">note:</label><br>
+    <input type="text" id="note" name="note">
+    <br>
+
+    <label for="group">group:</label><br>
+    <input type="text" id="group" name="group">
+    <br><br>
+    <input type="submit" value="Submit">
+    
+  </form>
+</div>
 
 
 
+    <div id='map'></div>
+</ion-content>
+</div>
 
-
-
-
-  <div id="centerdiv"></div>
-  <div id='map'></div>
-  
-  
-
+<!-- <div style='width: 100%;position: fixed;z-index: 10;'>
+    <ion-icon id="profile_icon" name="person-circle-outline"></ion-icon>
+    
+</div> -->
 
 
 
