@@ -20,17 +20,22 @@
 <body>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script src="./index.js"></script>
+
 
     <style>
       .dropdown-menu{
         z-index: 22;
       }
       #seachBar{
-        /* position: absolute; */
-        width : 25vw;
-        /* top: 8vh; */
-        display: inline-block;
+        height: 9vh; 
+      }
+
+      .input-group-prepend{
+        width: 100%;
+      }
+      .pb{
+        height: 9vh; 
+        width: 100%;
       }
       #popupFormDiv{
         display: none;
@@ -42,20 +47,20 @@
       }
         #profile_icon{
             z-index: 11;
-            height: 50px;
-            width: 50px;
+            height: 10vh; 
+            width: 100%;
         }
         #map {
           width: 100%;
           height: 100%;
         }img{
-          height: 50px;
-          width: 50px;
+          height: 9vh; 
+          width: 100%;
           display: inline-block;
         }
         #profileBar{
-          top: 5vh;
-          height: 90vh;
+          top: 10vh;
+          height: 80vh;
           display: none;
           width: 25vw;
           position: fixed;
@@ -69,10 +74,9 @@
         #topBar{
           position: relative;
           background-color: whitesmoke;
+           height: 10vh; 
         }
-        #profile_icon{
-          z-index: 3;
-        }
+
         #centerdiv{
           position: fixed;
           width: 100vw;
@@ -81,66 +85,85 @@
         .swal2-container{
           height: 100vh;
         }
+        .divEvents{
+          width: 20vw;
+          height: 10vw;
+          border-style: groove;
+          background-color: aliceblue;
+          /* opacity: .7; */
+        }
+        #div_events_container{
+          position: absolute;
+          top: 15vh;
+          height: 80vh;
+          border-style: groove;
+          overflow-y: scroll;
+        }
     </style>
 
-<div id="profileBar">
+<div id="profileBar">  
   Welcome to your profile
 
 </div>
-<div id="topBar">
 
-  <svg xmlns="http://www.w3.org/2000/svg" id="profile_icon" width="50" height="50" fill="currentColor" class="bi bi-person-vcard-fill" viewBox="0 0 16 16" onclick="toggleProfileView()">
-    <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm9 1.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 0-1h-4a.5.5 0 0 0-.5.5ZM9 8a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 0-1h-4A.5.5 0 0 0 9 8Zm1 2.5a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 0-1h-3a.5.5 0 0 0-.5.5Zm-1 2C9 10.567 7.21 9 5 9c-2.086 0-3.8 1.398-3.984 3.181A1 1 0 0 0 2 13h6.96c.026-.163.04-.33.04-.5ZM7 6a2 2 0 1 0-4 0 2 2 0 0 0 4 0Z"/>
-  </svg>
-  <img src="./wave.gif" alt="Italian Trulli">
 
-  <div class="input-group mb-3" id="seachBar">
-    <div class="input-group-prepend">
-      <button type="button" class="btn btn-outline-secondary">Action</button>
-      <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <span class="sr-only">Toggle Dropdown</span>
-      </button>
-      <div class="dropdown-menu">
-        <a class="dropdown-item" href="#">Nightlife</a>
-        <a class="dropdown-item" href="#">Food</a>
-        <a class="dropdown-item" href="#">Museums</a>
-        <div role="separator" class="dropdown-divider"></div>
-        <a class="dropdown-item" href="#">Separated link</a>
+<div id="topBar" class="col-xs-12">
+  <div class="row">
+
+    <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1">
+      <!-- <svg xmlns="http://www.w3.org/2000/svg" id="profile_icon" fill="currentColor" class="bi bi-person-vcard-fill" viewBox="0 0 16 16" onclick="toggleProfileView()">
+        <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm9 1.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 0-1h-4a.5.5 0 0 0-.5.5ZM9 8a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 0-1h-4A.5.5 0 0 0 9 8Zm1 2.5a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 0-1h-3a.5.5 0 0 0-.5.5Zm-1 2C9 10.567 7.21 9 5 9c-2.086 0-3.8 1.398-3.984 3.181A1 1 0 0 0 2 13h6.96c.026-.163.04-.33.04-.5ZM7 6a2 2 0 1 0-4 0 2 2 0 0 0 4 0Z"/>
+      </svg> -->
+      <img src="https://cdn-icons-png.flaticon.com/512/9432/9432277.png" id="profile_icon" alt="profileicon" onclick="toggleProfileView()">
+    </div>
+
+
+    <img src="./wave.gif" alt="Italian Trulli" class="col-xs-1 col-sm-1 col-md-1 col-lg-1">
+    <div class="input-group mb-3 col-xs-7 col-sm-7 col-md-7 col-lg-7" id="seachBar" >
+      <div class="input-group-prepend">
+        <button type="button" class="btn btn-outline-secondary">Action</button>
+        <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <span class="sr-only">Toggle Dropdown</span>
+        </button>
+        <div class="dropdown-menu">
+          <a class="dropdown-item" href="#">Nightlife</a>
+          <a class="dropdown-item" href="#">Food</a>
+          <a class="dropdown-item" href="#">Museums</a>
+          <div role="separator" class="dropdown-divider"></div>
+          <a class="dropdown-item" href="#">Separated link</a>
+        </div>
+        <input type="text" id='searchInputValue' oninput="search_bar_events();" class="form-control" aria-label="Text input with segmented dropdown button">
       </div>
-      <input type="text" id='searchInputValue' oninput="search_bar_events();" class="form-control" aria-label="Text input with segmented dropdown button">
+    </div>
+
+    <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1">
+      <button onclick="checkIn()" type="button" class="btn btn-success pb">Checkin</button>
 
     </div>
+    <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1">
+      <button type="button" class="btn btn-info pb">Wave Leader Drop</button>
+
+    </div>
+    <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1">
+      <button type="button" class="btn btn-secondary pb">Vendor Panal</button>
+
+    </div>
+
+
   </div>
-
-  <button onclick="checkIn()" type="button" class="btn btn-success">Checkin</button>
-  <button type="button" class="btn btn-info">Wave Leader Drop</button>
-  <button type="button" class="btn btn-secondary">Vendor Panal</button>
-
 </div>
-
-
-<!-- <ion-header>
-    <ion-toolbar>
-    <ion-buttons slot="start">
-        <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <ion-title>WaveFinder</ion-title>
-    <ion-icon id="profile_icon" name="person-circle-outline" onclick="getLocation()"></ion-icon>
-    <img src="./wave.gif" alt="Italian Trulli">
-    </ion-toolbar>
-</ion-header> -->
-
-
-
 
 
 
 
   <div id="centerdiv"></div>
+
   <div id='map'></div>
   
   
-
+<div id="div_events_container">
+  
+</div>
 
 
 
@@ -166,15 +189,9 @@ map.resize();
 
 
 </script>
-<script>
 
+<script src="./index.js"></script>
 
-
-</script>
-
-<script>
-
-</script>
 </body>
 </html>
 

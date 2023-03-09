@@ -2,6 +2,7 @@
 const xhr = new XMLHttpRequest();
 const xhr2 = new XMLHttpRequest();
 const xhr3 = new XMLHttpRequest();
+const xhr4 = new XMLHttpRequest();
 
 var checkins_all;
 var events_all;
@@ -114,16 +115,14 @@ function search_bar_events(){
   for(let x=0; x<events_all.results.length; x++){
     let isPushed = false;
     //console.log(events_all[x])
-    if( events_all.results[x].name.includes(searchInputValue) ){
+    if( events_all.results[x].name.toLowerCase().includes(searchInputValue.toLowerCase()) ){
       temp_events.push(events_all.results[x]);
       isPushed = true;
     }
 
     if(isPushed == false){
-      //console.log(events_all.results[x].categories);
       for(let v=0; v< events_all.results[x].categories.length; v++){
-        //console.log(events_all.results[x].categories);
-        if( events_all.results[x].categories[v].name.includes(searchInputValue) && isPushed == false){
+        if( events_all.results[x].categories[v].name.toLowerCase().includes(searchInputValue.toLowerCase()) && isPushed == false){
           temp_events.push(events_all.results[x]);
           isPushed = true;
         }
@@ -132,7 +131,10 @@ function search_bar_events(){
 
 
   }//end of outer for loop
-  console.log(temp_events)
+  //console.log(temp_events)
+  //div_event_stacks = temp_events;
+  build_search_event_div(temp_events)
+
 }//end of function
 
 let profile_toggle = false;
@@ -155,7 +157,6 @@ function getUserDeatails(){
       //console.log(response);  
       user = response;
       document.getElementById("profileBar").innerHTML += `<br>Username: `+JSON.stringify(user.username);
-
     } else {
       console.error(xhr3.statusText);   
 
@@ -169,6 +170,31 @@ function getUserDeatails(){
   xhr3.send();
 }
 getUserDeatails();
+
+document.getElementById("profile_icon").addEventListener('click', updateProfileDetails);
+function updateProfileDetails(){
+  document.getElementById("profileBar").innerHTML = `<br>Username: `+ user.username;
+  xhr4.open("GET", "./checkins");
+   xhr4.onload = function() {
+    if (xhr4.status === 200) {
+      const response = JSON.parse(xhr4.responseText);
+      console.log(response);  
+      checkins = response;
+      for(let x=0; x<checkins.length; x++){
+        document.getElementById("profileBar").innerHTML += `<br>Checked Into: `+JSON.stringify(checkins[x].event);
+      }
+    } else {
+      console.error(xhr4.statusText);   
+
+    }
+  };
+
+  xhr4.onerror = function() {
+    console.error(xhr4.statusText);   
+  };
+  
+  xhr4.send();
+}
 
 function checkIn(vendername){
   Swal.fire({
@@ -227,5 +253,61 @@ function checkInVendor(vendername){
   } 
   else {
     console.error('Geolocation not supported');
-}}
+}
+}
+
+var div_event_stacks = [];
+function destory_event_divs(){
+  for(let x=0; x<div_event_stacks.length; x++){
+    ///div_ele = document.getElementById("div_event_" + x);
+    div_event_stacks[x].remove()
+  }
+}
+
+let destory = false;
+function build_search_event_div(temp_events){
+    //alert(document.getElementById("searchInputValue").value.length)
+  if(document.getElementById("searchInputValue").value.length < 1){
+    //Get rid of all the event divs
+    //alert("hello")
+    destory_event_divs();
+  }
+  else if(destory == false){
+    for(let x=0; x<temp_events.length; x++){
+      let div_ele = document.createElement("div");
+      div_ele.id = "div_event_" + x;
+      div_ele.className = "divEvents"
+      div_ele.innerHTML = temp_events[x].name;
+      div_event_stacks.push(div_ele);
+      document.getElementById("div_events_container").appendChild(div_ele);
+      div_ele.addEventListener('click', function() {
+        map.flyTo({
+          center: [temp_events[x].geocodes.main.longitude, temp_events[x].geocodes.main.latitude],
+          zoom: 17, // Zoom level
+          essential: true // This animation is considered essential with respect to prefers-reduced-motion
+        });
+      });
+    }
+    destory = true;
+  }
+  else if ( destory == true){
+    destory_event_divs();
+    for(let x=0; x<temp_events.length; x++){
+      let div_ele = document.createElement("div");
+      div_ele.id = "div_event_" + x;
+      div_ele.className = "divEvents"
+      div_ele.innerHTML = temp_events[x].name;
+      div_event_stacks.push(div_ele);
+      document.getElementById("div_events_container").appendChild(div_ele);
+      div_ele.addEventListener('click', function() {
+        map.flyTo({
+          center: [temp_events[x].geocodes.main.longitude, temp_events[x].geocodes.main.latitude],
+          zoom: 14, // Zoom level
+          essential: true // This animation is considered essential with respect to prefers-reduced-motion
+        });
+      });
+      //console.log(temp_events)
+    }
+  }
+}
   

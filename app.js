@@ -161,9 +161,16 @@ app.get('/user', (req, res) => {
             if(err){
               return res.send('Error');
             }
-            //console.log(users)
+            // Checkin.findOne({'username': req.session.passport.user}, function(err, checkins){
+            //         if (err) {
+            //             res.send(err);
+            //         } else {
+                        
+            //             res.json(checkins, users)
+            //         }
+            // }); 
             res.json(users);
-          });
+        });
     }
     else{
         res.send("you are not authorized");
