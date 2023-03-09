@@ -67,7 +67,10 @@ function dropMarkers(response){
         }  
       }
       var encodedName =  element.name.replace(/'/g, '');
-      var html = '<button onclick="checkInVendor(\'' + encodedName + '\')" type="button" class="btn btn-success">Checkin</button>';
+      var lat1 = element.geocodes.main.latitude;
+      var lon1 = element.geocodes.main.longitude;
+      let package = [encodedName,lat1,lon1]
+      var html = '<button onclick="checkInVendor(\'' + package.toString ( ) + '\')" type="button" class="btn btn-success">Checkin</button>';
       if(event_checkins.length > 0){
         var marker1 = new mapboxgl.Marker()
         .setLngLat([element.geocodes.main.longitude, element.geocodes.main.latitude])
@@ -200,7 +203,7 @@ function checkIn(vendername){
   Swal.fire({
     icon: 'success',
     title: 'Check-in',
-    html:'<label for="username">Username:</label><br><input type="text" readonly id="username" name="username"><br><label for="lat">lat:</label><br><input type="text" readonly id="lat" name="lat"><br><label for="lon">lon:</label><br><input type="text" readonly id="lon" name="lon"><br><label for="event">event:</label><br><input type="text" id="event" name="event"><br><label for="note">note:</label><br><input type="text" id="note" name="note"><br><label for="group">group:</label><br><input type="text" id="group" name="group"><br><br><input type="submit" value="Submit">',
+    html:'<form action="/checkin" method="post"> <label for="username">Username:</label><br><input type="text" readonly id="username" name="username"><br><label for="lat">lat:</label><br><input type="text" readonly id="lat" name="lat"><br><label for="lon">lon:</label><br><input type="text" readonly id="lon" name="lon"><br><label for="event">event:</label><br><input type="text" id="event" name="event"><br><label for="note">note:</label><br><input type="text" id="note" name="note"><br><label for="group">group:</label><br><input type="text" id="group" name="group"><br><br><input type="submit" value="Submit">  </form>',
     target: document.body
   })
   document.getElementById("username").value = user.username;
@@ -225,35 +228,23 @@ function checkIn(vendername){
     console.error('Geolocation not supported');
 }}
 
-function checkInVendor(vendername){
+
+
+function checkInVendor(package){
   console.log("checkinVendero is called")
+  const arrLoad = package.split(",");
   Swal.fire({
     icon: 'success',
     title: 'Check-in',
-    html:'<label for="username">Username:</label><br><input type="text" readonly id="username" name="username"><br><label for="lat">lat:</label><br><input type="text" readonly id="lat" name="lat"><br><label for="lon">lon:</label><br><input type="text" readonly id="lon" name="lon"><br><label for="event">event:</label><br><input type="text" readonly id="event" name="event"><br><label for="note">note:</label><br><input type="text" id="note" name="note"><br><label for="group">group:</label><br><input type="text" id="group" name="group"><br><br><input type="submit" value="Submit">',
+    html:'<form action="/checkin" method="post"> <label for="username">Username:</label><br><input type="text" readonly id="username" name="username"><br><label for="lat">lat:</label><br><input type="text" readonly id="lat" name="lat"><br><label for="lon">lon:</label><br><input type="text" readonly id="lon" name="lon"><br><label for="event">event:</label><br><input type="text" readonly id="event" name="event"><br><label for="note">note:</label><br><input type="text" id="note" name="note"><br><label for="group">group:</label><br><input type="text" id="group" name="group"><br><br><input type="submit" value="Submit">  </form>',
     target: document.body
   })
   document.getElementById("username").value = user.username;
-  if(vendername){
-    document.getElementById("event").value = vendername;
+  if(arrLoad[0]){
+    document.getElementById("event").value = arrLoad[0];
   }
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      function(position) {
-        const latitude = position.coords.latitude;
-        document.getElementById("lat").value = latitude;
-        const longitude = position.coords.longitude;
-        document.getElementById("lon").value = longitude;
-        //console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
-      },
-      function(error) {
-        console.error(`Geolocation error: ${error.message}`);
-      }
-    );
-  } 
-  else {
-    console.error('Geolocation not supported');
-}
+        document.getElementById("lat").value = arrLoad[1];
+        document.getElementById("lon").value = arrLoad[2];
 }
 
 var div_event_stacks = [];
@@ -283,7 +274,7 @@ function build_search_event_div(temp_events){
       div_ele.addEventListener('click', function() {
         map.flyTo({
           center: [temp_events[x].geocodes.main.longitude, temp_events[x].geocodes.main.latitude],
-          zoom: 17, // Zoom level
+          zoom: 21, // Zoom level
           essential: true // This animation is considered essential with respect to prefers-reduced-motion
         });
       });
