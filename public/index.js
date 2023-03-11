@@ -38,7 +38,7 @@ function load2_events(){
       //const venues = response.response.venues;
       //console.log(response);
       events_all = response
-      dropMarkers(response);
+      dropMarkers();
     } else {
       console.error(xhr.statusText);
     }
@@ -50,64 +50,377 @@ function load2_events(){
   
   xhr.send();
 }
+ 
+// This implements `StyleImageInterface`
+// to draw a pulsing dot icon on the map.
 
 var markers = [];
-function dropMarkers(response){
+function dropMarkers(){
 //console.log(response.results)
-  response.results.forEach((element) => {
-      //console.log(element.geocodes.main);
-      //console.log(element.geocodes.main.latitude);
-      //console.log(element.geocodes.main.longitude);
-      //console.log(element.name);
-      var event_checkins = [];
-      for(x=0; x<checkins_all.length; x++){
-        if(checkins_all[x].event == element.name){
-          event_checkins.push(checkins_all[x]);
-          //console.log(event_checkins)
-        }  
-      }
-      var encodedName =  element.name.replace(/'/g, '');
-      var lat1 = element.geocodes.main.latitude;
-      var lon1 = element.geocodes.main.longitude;
-      let package = [encodedName,lat1,lon1]
-      var html = '<button onclick="checkInVendor(\'' + package.toString ( ) + '\')" type="button" class="btn btn-success">Checkin</button>';
-      if(event_checkins.length > 0){
-        var marker1 = new mapboxgl.Marker()
-        .setLngLat([element.geocodes.main.longitude, element.geocodes.main.latitude])
-        .setPopup(new mapboxgl.Popup({ offset: 25 })
-        .setHTML('<h2>'+element.name+'</h2> <br> <p>'+element.location.formatted_address+'<p/> <p> Checkin count is: '+ JSON.stringify(event_checkins.length) +`</p><br>` + html))
-        //.setHTML('<h2>'+element.name+'</h2><p>'+ JSON.stringify(event_checkins) +' is checked-in</p>'))
-        .addTo(map);
-        markers.push(marker1);
-      }else{
-        var marker1 = new mapboxgl.Marker()
-        .setLngLat([element.geocodes.main.longitude, element.geocodes.main.latitude])
-        .setPopup(new mapboxgl.Popup({ offset: 25 })
-        .setHTML('<h2>'+element.name+'</h2><p> No checkins available.</p><br>' + html))
-        .addTo(map);
-        markers.push(marker1);
-      }
+
+  events_all.results.forEach((element) => {
+        //console.log(element.geocodes.main);
+        //console.log(element.geocodes.main.latitude);
+        //console.log(element.geocodes.main.longitude);
+        //console.log(element.name);
+        var event_checkins = [];
+        for(x=0; x<checkins_all.length; x++){
+          if(checkins_all[x].event == element.name){
+            
+            event_checkins.push(checkins_all[x]);
+            //console.log(event_checkins)
+          }  
+        }
+        var encodedName =  element.name.replace(/'/g, '');
+        var lat1 = element.geocodes.main.latitude;
+        var lon1 = element.geocodes.main.longitude;
+        let package = [encodedName,lat1,lon1]
+        var html = '<button onclick="checkInVendor(\'' + package.toString ( ) + '\')" type="button" class="btn btn-success">Checkin</button>';
+        if(event_checkins.length > 0){
+          var marker1 = new mapboxgl.Marker()
+          .setLngLat([element.geocodes.main.longitude, element.geocodes.main.latitude])
+          .setPopup(new mapboxgl.Popup({ offset: 25 })
+          .setHTML('<h2>'+element.name+'</h2> <br> <p>'+element.location.formatted_address+'<p/> <p> Checkin count is: '+ JSON.stringify(event_checkins.length) +`</p><br>` + html))
+          //.setHTML('<h2>'+element.name+'</h2><p>'+ JSON.stringify(event_checkins) +' is checked-in</p>'))
+          .addTo(map);
+          markers.push(marker1);
+          element.marker = marker1
+
+
+
+        }else{
+          var marker1 = new mapboxgl.Marker()
+          .setLngLat([element.geocodes.main.longitude, element.geocodes.main.latitude])
+          .setPopup(new mapboxgl.Popup({ offset: 25 })
+          .setHTML('<h2>'+element.name+'</h2><p> No checkins available.</p><br>' + html))
+          .addTo(map);
+          markers.push(marker1);
+          element.marker = marker1
+        }
+        //console.log(events_all)
   });
+  build_addSources_addLayer()
+}
+let featureArray = [];
 
-  map.on('moveend', function (e) {
-    var bounds = map.getBounds();
-      // Loop through the markers
-      markers.forEach(function(marker) {
-      // Check if the marker is within the bounds
-      if (bounds.contains([marker._lngLat['lng'], marker._lngLat['lat']])) {
-        // Add the marker to the list of markers within bounds
-        //markersInBounds.push(marker);
-        //console.log(marker)
-        console.log(map.getZoom())
+// for(var z=0; z<events_all.results.length; z++){
+//   if(!events_all.results[z].geocodes){
+//     console.log(events_all.results[z])
+//   }
+// }
 
-        if(map.getZoom() > 15){
-          marker.togglePopup();
+const sizeS = 200;
+const sizeM = 655;
+const sizeB = 1000;
+var pulsingLayers = []
+function build_addSources_addLayer(){
+  //console.log(events_all.results.length)
+  const pulsingDotSmall = {
+    width: sizeS,
+    height: sizeS,
+    data: new Uint8Array(sizeS * sizeS * 4),
+     
+    // When the layer is added to the map,
+    // get the rendering context for the map canvas.
+    onAdd: function () {
+    const canvas = document.createElement('canvas');
+    canvas.width = this.width;
+    canvas.height = this.height;
+    this.context = canvas.getContext('2d');
+    },
+     
+    // Call once before every frame where the icon will be used.
+    render: function () {
+    const duration = 1000;
+    const t = (performance.now() % duration) / duration;
+     
+    const radius = (sizeS / 2) * 0.3;
+    const outerRadius = (sizeS / 2) * 0.7 * t + radius;
+    const context = this.context;
+     
+    // Draw the outer circle.
+    context.clearRect(0, 0, this.width, this.height);
+    context.beginPath();
+    context.arc(
+    this.width / 2,
+    this.height / 2,
+    outerRadius,
+    0,
+    Math.PI * 2
+    );
+    context.fillStyle = `rgba(255, 200, 200, ${1 - t})`;
+    context.fill();
+     
+    // Draw the inner circle.
+    context.beginPath();
+    context.arc(
+    this.width / 2,
+    this.height / 2,
+    radius,
+    0,
+    Math.PI * 2
+    );
+    context.fillStyle = 'rgba(255, 100, 100, 1)';
+    context.strokeStyle = 'white';
+    context.lineWidth = 2 + 4 * (1 - t);
+    context.fill();
+    context.stroke();
+     
+    // Update this image's data with data from the canvas.
+    this.data = context.getImageData(
+    0,
+    0,
+    this.width,
+    this.height
+    ).data;
+     
+    // Continuously repaint the map, resulting
+    // in the smooth animation of the dot.
+    map.triggerRepaint();
+     
+    // Return `true` to let the map know that the image was updated.
+    return true;
+    }
+  };
+  const pulsingDotMid = {
+    width: sizeM,
+    height: sizeM,
+    data: new Uint8Array(sizeM * sizeM * 4),
+     
+    // When the layer is added to the map,
+    // get the rendering context for the map canvas.
+    onAdd: function () {
+    const canvas = document.createElement('canvas');
+    canvas.width = this.width;
+    canvas.height = this.height;
+    this.context = canvas.getContext('2d');
+    },
+     
+    // Call once before every frame where the icon will be used.
+    render: function () {
+    const duration = 1000;
+    const t = (performance.now() % duration) / duration;
+     
+    const radius = (sizeM / 2) * 0.3;
+    const outerRadius = (sizeM / 2) * 0.7 * t + radius;
+    const context = this.context;
+     
+    // Draw the outer circle.
+    context.clearRect(0, 0, this.width, this.height);
+    context.beginPath();
+    context.arc(
+    this.width / 2,
+    this.height / 2,
+    outerRadius,
+    0,
+    Math.PI * 2
+    );
+    context.fillStyle = `rgba(255, 200, 200, ${1 - t})`;
+    context.fill();
+     
+    // Draw the inner circle.
+    context.beginPath();
+    context.arc(
+    this.width / 2,
+    this.height / 2,
+    radius,
+    0,
+    Math.PI * 2
+    );
+    context.fillStyle = 'rgba(255, 100, 100, 1)';
+    context.strokeStyle = 'white';
+    context.lineWidth = 2 + 4 * (1 - t);
+    context.fill();
+    context.stroke();
+     
+    // Update this image's data with data from the canvas.
+    this.data = context.getImageData(
+    0,
+    0,
+    this.width,
+    this.height
+    ).data;
+     
+    // Continuously repaint the map, resulting
+    // in the smooth animation of the dot.
+    map.triggerRepaint();
+     
+    // Return `true` to let the map know that the image was updated.
+    return true;
+    }
+  };
+  const pulsingDotBig = {
+    width: sizeB,
+    height: sizeB,
+    data: new Uint8Array(sizeB * sizeB * 4),
+     
+    // When the layer is added to the map,
+    // get the rendering context for the map canvas.
+    onAdd: function () {
+    const canvas = document.createElement('canvas');
+    canvas.width = this.width;
+    canvas.height = this.height;
+    this.context = canvas.getContext('2d');
+    },
+     
+    // Call once before every frame where the icon will be used.
+    render: function () {
+    const duration = 1000;
+    const t = (performance.now() % duration) / duration;
+     
+    const radius = (sizeB / 2) * 0.3;
+    const outerRadius = (sizeB / 2) * 0.7 * t + radius;
+    const context = this.context;
+     
+    // Draw the outer circle.
+    context.clearRect(0, 0, this.width, this.height);
+    context.beginPath();
+    context.arc(
+    this.width / 2,
+    this.height / 2,
+    outerRadius,
+    0,
+    Math.PI * 2
+    );
+    context.fillStyle = `rgba(255, 200, 200, ${1 - t})`;
+    context.fill();
+     
+    // Draw the inner circle.
+    context.beginPath();
+    context.arc(
+    this.width / 2,
+    this.height / 2,
+    radius,
+    0,
+    Math.PI * 2
+    );
+    context.fillStyle = 'rgba(255, 100, 100, 1)';
+    context.strokeStyle = 'white';
+    context.lineWidth = 2 + 4 * (1 - t);
+    context.fill();
+    context.stroke();
+     
+    // Update this image's data with data from the canvas.
+    this.data = context.getImageData(
+    0,
+    0,
+    this.width,
+    this.height
+    ).data;
+     
+    // Continuously repaint the map, resulting
+    // in the smooth animation of the dot.
+    map.triggerRepaint();
+     
+    // Return `true` to let the map know that the image was updated.
+    return true;
+    }
+  };
+  map.addImage('pulsing-s', pulsingDotSmall, { pixelRatio: 2 });
+  map.addImage('pulsing-m', pulsingDotMid, { pixelRatio: 2 });
+  map.addImage('pulsing-b', pulsingDotBig, { pixelRatio: 2 });
+
+
+  for(var x=0; x<events_all.results.length; x++){
+      //console.log(events_all.results[x])
+      let checkin_event_count = 0;
+      for(let y=0; y<checkins_all.length; y++){
+        if(checkins_all[y].event == events_all.results[x].name){
+          checkin_event_count++;
         }
       }
-    });
-  });
+      if(checkin_event_count > 0){
+        featureArray.push({
+          'type': 'Feature',
+          'geometry': {
+              'type': 'Point',
+              'coordinates': [events_all.results[x].geocodes.main.longitude, events_all.results[x].geocodes.main.latitude] // icon position [lng, lat]
+            }
+        })   
+      }
+  }//end of for
+
+
+  const dataSource = {
+    type: 'geojson',
+    data: {
+      type: 'FeatureCollection',
+      features: featureArray
+    }
+  };
+  map.addSource('my-source', dataSource);
+
+  // console.log(featureArray);
+  // map.addSource('dot-point', {
+  //   'type': 'geojson',
+  //   'data': {
+  //       'type': 'FeatureCollection',
+  //       'features': featureArray
+  //   }
+  // });
+
+  //loop to add.map.layer
+  for(var x=0; x<events_all.results.length; x++){ 
+
+    let checkin_event_count = 0;
+    for(let y=0; y<checkins_all.length; y++){
+      if(checkins_all[y].event == events_all.results[x].name){
+        checkin_event_count++;
+      }
+    }
+
+    let circle_to_use = "";
+    if(checkin_event_count == 0){
+      
+    }
+    else if(checkin_event_count == 1){
+      circle_to_use = "pulsing-s"
+    }
+    else if(checkin_event_count == 2){
+      circle_to_use = "pulsing-m"
+    }
+    else if(checkin_event_count >= 3){
+      circle_to_use = "pulsing-b"
+    }
+
+    if(checkin_event_count > 0){
+      console.log(events_all.results[x].name);
+      console.log(checkin_event_count);
+      console.log(circle_to_use);
+        map.addLayer({
+            'id': 'layer-with-pulsing-dot' + events_all.results[x].fsq_id,
+            'type': 'symbol',
+            'source': 'my-source',
+            "layout": {
+              "icon-image": circle_to_use
+          }
+        });
+    }
+
+
+   }//end of for
+
 
 }
+
+
+map.on('moveend', function (e) {
+  var bounds = map.getBounds();
+    // Loop through the markers
+    markers.forEach(function(marker) {
+    // Check if the marker is within the bounds
+    if (bounds.contains([marker._lngLat['lng'], marker._lngLat['lat']])) {
+      // Add the marker to the list of markers within bounds
+      //markersInBounds.push(marker);
+      //console.log(marker)
+      //console.log(map.getZoom())
+
+      if(map.getZoom() > 15){
+        marker.togglePopup();
+      }
+    }
+  });
+});
 
 
 function search_bar_events(){
@@ -228,8 +541,6 @@ function checkIn(vendername){
     console.error('Geolocation not supported');
 }}
 
-
-
 function checkInVendor(package){
   console.log("checkinVendero is called")
   const arrLoad = package.split(",");
@@ -301,4 +612,10 @@ function build_search_event_div(temp_events){
     }
   }
 }
+
+
+
+
+
+
   
