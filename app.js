@@ -83,6 +83,7 @@ app.get('/login', (req, res) => {
 
 app.post('/checkin', (req, res) => {
     //console.log("Checkin System is working")
+    console.log(req.body)
     if(req.isAuthenticated()){
         // console.log(req.body.username)
         // console.log(req.body.lat)
@@ -98,8 +99,8 @@ app.post('/checkin', (req, res) => {
             note: req.body.note, 
             group: req.body.group
         }))
-        res.sendFile(path.join(__dirname, '/public/index.html'));
-
+        //res.sendFile(path.join(__dirname, '/public/index.html'));
+        res.send('Completed')
 
     }
     else{
@@ -189,10 +190,13 @@ app.listen(3000, () => {
 
 const sdk = require('api')('@fsq-developer/v1.0#17kgj534lcjp10ly');
 
-app.get('/getbars', (req, res) => {
+app.get('/getbars/:parameter', (req, res) => {
+    const parameterValue = req.params.parameter;
+
+    //console.log(parameterValue)
     if(req.isAuthenticated()){
         sdk.auth('fsq31nZd/LHTXe2cEt1nsSXfkshfuV8aRRATkqYL5G9jEJk=');
-        sdk.placeSearch({query: 'Nightclub', near: 'New%20York', limit: '50'})
+        sdk.placeSearch({query: parameterValue, near: 'New%20York', limit: '50'})
         .then(({ data }) => res.json(data)) 
           .catch(err => res.send(err));
     }

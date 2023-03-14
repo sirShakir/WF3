@@ -1,0 +1,80 @@
+
+.dropdown-menu{
+  z-index: 22;
+}
+#seachBar{
+  height: 9vh; 
+}
+
+.input-group-prepend{
+  width: 100%;
+}
+.pb{
+  height: 9vh; 
+  width: 100%;
+}
+#popupFormDiv{
+  display: none;
+  position: fixed;
+  z-index: 2;
+  background-color: aliceblue;
+  right: 50%;
+  top: 40%;
+}
+  #profile_icon{
+      z-index: 11;
+      height: 10vh; 
+      width: 100%;
+  }
+  #map {
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+  }img{
+    height: 9vh; 
+    width: 100%;
+    display: inline-block;
+  }
+  #profileBar{
+    top: 10vh;
+    height: 80vh;
+    display: none;
+    width: 25vw;
+    position: fixed;
+    z-index: 2;
+    background-color: rgb(132, 132, 132);
+  }
+  svg{
+    vertical-align: middle;
+
+  }
+  #topBar{
+    position: relative;
+    background-color: whitesmoke;
+       /* height: 10vh;   */
+    /* width: 100vw; */
+    }
+
+  #centerdiv{
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+  }
+  .swal2-container{
+    height: 100vh;
+  }
+  .divEvents{
+    width: 20vw;
+    height: 10vw;
+    border-style: groove;
+    background-color: aliceblue;
+    /* opacity: .7; */
+  }
+  #div_events_container{
+    position: absolute;
+    top: 15vh;
+    height: 80vh;
+    border-style: groove;
+    overflow-y: scroll;
+    z-index: 3;
+  }
